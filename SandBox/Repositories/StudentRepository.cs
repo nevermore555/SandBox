@@ -21,27 +21,50 @@ namespace SandBox.Repositories
 
         public Student Get(int id)
         {
+            if (students.FindIndex(s => s.Id == id) == -1)
+            {
+                throw new Exception($"ID \"{id}\" not found");
+            }
             return students.Find(s => s.Id == id);
         }
 
-        public Student Add(Student item)
+        public bool Add(Student item)
         {
+
+            if (item.Name is null)
+            {
+                return false;
+            }
+
             item.Id = _nextId++;
             students.Add(item);
-            return item;
+
+            return true;
         }
 
-        public void Remove(int id)
+        public bool Remove(int id)
         {
+            if (students.FindIndex(s => s.Id == id) == -1)
+            {
+                return false;
+            }
+
             students.RemoveAll(s => s.Id == id);
+
+            return true;
         }
 
         public bool Update(Student item)
         {
             int index = students.FindIndex(s => s.Id == item.Id);
+            if (index == -1 || item.Name is null)
+            {
+                return false;
+            }
 
             students.RemoveAt(index);
             students.Add(item);
+
             return true;
         }
     }

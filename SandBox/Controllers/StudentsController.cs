@@ -10,56 +10,57 @@ namespace SandBox.Controllers
         static StudentRepository studentRepository = new StudentRepository();
 
         [HttpGet]
-        public List<Student> GetAll()
+        public IEnumerable<Student> GetAll()
         {
             return studentRepository.GetAll();
         }
 
         public IActionResult Get(int id)
         {
-            Student item = studentRepository.Get(id);
-            if (item == null)
+            Student item;
+            try
             {
-                return NoContent();
+                item = studentRepository.Get(id);
             }
+            catch (Exception ex)
+            {
+                return Ok(ex.Message);
+            }
+            
             return Ok(item);
         }
 
         [HttpPost]
         public IActionResult Add([FromBody] Student item)
         { 
-            if (item == null)
+            if (!studentRepository.Add(item))
             {
-                return BadRequest();
+                return BadRequest("Name is null");
             }
 
-            studentRepository.Add(item);
-            return Ok();
+            return Ok("Added");
         }
 
         [HttpPut]
         public IActionResult Update([FromBody] Student item)
         {
-            if (item == null)
+            if (!studentRepository.Update(item))
             {
-                return BadRequest();
+                return BadRequest("Invalid ID or Name");
             }
 
-            studentRepository.Update(item);
-            return Ok();
+            return Ok("Updated");
         }
 
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            Student item = studentRepository.Get(id);
-            if (item == null)
+            if (!studentRepository.Remove(id))
             {
-                return NoContent();
+                return Ok("Invalid ID");
             }
 
-            studentRepository.Remove(id);
-            return Ok();
+            return Ok("Deleted");
         }
     }
 }
